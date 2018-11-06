@@ -9,17 +9,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration extends
-        WebSecurityConfigurerAdapter {
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
-    public PasswordEncoder encoder() {
+    public static BCryptPasswordEncoder encoder(){
         return new BCryptPasswordEncoder();
     }
 
@@ -30,23 +27,19 @@ public class SecurityConfiguration extends
     private UserRepository userRepository;
 
     @Override
-    public UserDetailsService userDetailsServiceBean(){
+    public UserDetailsService userDetailsServiceBean() throws Exception{
         return new SSUserDetailsService(userRepository);
     }
 
-//    @Bean
-//    public static BCryptPasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
-
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    protected void configure(HttpSecurity http) throws Exception{
         http
                 .authorizeRequests()
-                .antMatchers("/", "/h2/**").permitAll()
+                .antMatchers("/","/h2/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().loginPage("/login").permitAll()
+                .formLogin()
+                .loginPage("/login").permitAll()
                 .and()
                 .logout()
                 .logoutRequestMatcher(
@@ -58,28 +51,12 @@ public class SecurityConfiguration extends
                 .csrf().disable();
         http
                 .headers().frameOptions().disable();
-
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsServiceBean())
-                .passwordEncoder(encoder());
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception{
+        auth.userDetailsService(userDetailsServiceBean()).passwordEncoder(encoder
+                ());
     }
-//
-//        protected void configure(AuthenticationManagerBuilder auth)
-//        throws Exception {
-//            auth.inMemoryAuthentication()
-//                    .withUser("dave")
-//                    .password(passwordEncoder().encode("begreat"))
-//                    .authorities("ADMIN")
-//                    .and()
-//                    .withUser("user")
-//                    .password(passwordEncoder().encode("password"))
-//                    .authorities("USER");
-//
-//        }
-
-
 
 }

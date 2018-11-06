@@ -5,25 +5,22 @@ import java.util.Collection;
 
 @Entity
 public class Role {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column(unique=true)
+    @Column(unique = true)
     private String role;
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private Collection<User> users;
 
-    public Role(String role, Collection<User> users) {
-        this.role = role;
-        this.users = users;
+    public Role() {
     }
 
-    public Role(String role) {
+    public Role(String role){
         this.role = role;
-            }
-    public Role() {
     }
 
     public long getId() {
